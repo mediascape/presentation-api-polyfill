@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <script src="https://www.gstatic.com/cv/js/sender/v1/cast_sender.js"></script>
+    <script src="../../presentation-api-polyfill.js"></script>
+    <title>Presentation API polyfill - Hello world example</title>
+  </head>
+  <body>
+    <h1>
+      Presentation API polyfill
+      <br/>Hello world example
+    </h1>
+    <p>Use the "<em>Open presentation</em>" button below to open a presentation. This should display a list of second screens (or types of screens) available for the presentation.</p>
+    <p>The "<em>Close presentation</em>" button will attempt to terminate the presentation. Note that this may not have any effect, depending on the presentation mechanism that was used under the hoods. Similarly, the code may or may not be able to create a messaging channel between the controlling and receiving side.</p>
+    <p><strong>Important:</strong> Opening the presentation in another browser window will most likely fail the first time because your browser will block the pop-up window. Allow this page to open pop-up window and try again to fix the problem.</p>
+    <p>
+      <button id="open">Open presentation</button>
+      <button id="close" disabled="disabled">Close presentation</button>
+    </p>
+    <p>
+    <p>Current messaging channel status: <span id="status">disconnected</span>.</p>
+  </body>
+  <script type="text/javascript">
+    window.onload = function () {
+      var openButton = document.getElementById('open');
+      var closeButton = document.getElementById('close');
+      var status = document.getElementById('status');
+      var connection = null;
+
+      openButton.addEventListener('click', function (evt) {
+        evt.preventDefault();
+        var presentationRequest = new w3cPresentationRequest('receiver.html');
+        presentationRequest.start().then(function (presentationConnection) {
+          connection = presentationConnection;
+          openButton.disabled = true;
+          closeButton.disabled = false;
+          connection.onstatechange = function () {
+            console.log('presentation connection state changed to "' + connection.state + '"');
+            status.innerHTML = connection.state;
+            if (connection.state === 'terminated') {
+              connection = null;
+              openButton.disabled = false;
+              closeButton.disabled = true;
+            }
+          };
+        });
+        return false;
+      });
+
+      closeButton.addEventListener('click', function (evt) {
+        evt.preventDefault();
+        if (!connection) {
+          return false;
+        }
+        connection.terminate();
+        connection = null;
+        openButton.disabled = false;
+        closeButton.disabled = true;
+        return false;
+      });
+    };
+  </script>
+</html>

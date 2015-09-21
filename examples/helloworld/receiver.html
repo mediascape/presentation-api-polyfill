@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <script src="https://www.gstatic.com/cast/sdk/libs/receiver/2.0.0/cast_receiver.js"></script>
+    <script src="../../presentation-api-polyfill.js"></script>
+    <title>Presentation API polyfill - Hello world example</title>
+  </head>
+  <body>
+    <h1>Hello world</h1>
+    <p>This simple page represents the receiving application that was launched through the Presentation API.</p>
+    <p>Depending on the mechanism used to launch that application, the messaging channel may or may not be availble.</p>
+    <p>Current messaging channel status: <span id="status">disconnected</span>.</p>
+  </body>
+  <script type="text/javascript">
+    window.onload = function () {
+      var status = document.getElementById('status');
+      navigator.w3cPresentation.receiver.getConnection().then(function (connection) {
+        presentationConnection = connection;
+        status.innerHTML = presentationConnection.state;
+        connection.onstatechange = function () {
+          status.innerHTML = connection.state;
+        };
+      });
+    };
+  </script>
+</html>
