@@ -21,6 +21,15 @@
  *
  * Ensure that you ran "npm install" on the repository first as that server
  * references third-party libraries.
+ *
+ * Also, Physical Web imposes heavy constraints on the size of the URL that
+ * may be broadcasted (less than 21 bytes long, typically!), making the
+ * mechanism unfit in most scenarios. The goal of this mechanism is to explore
+ * to what extent the Presentation API may be used to send invitations to
+ * join a particular URL. In particular, such a mechanism does not allow the
+ * controlling user agent to even know whether some other device responded to
+ * the invitation. No messaging channel can be established between the
+ * controlling and receiving side.
  */
 (function () {
   // Retrieve classes that the Presentation API polyfill exposes so that we
