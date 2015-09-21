@@ -20,8 +20,10 @@
 
       <dt>Physical Web</dt>
       <dd>Supports broadcasting the URL to present through a Bluetooth Low-Energy (BLE) device. This mechanism heavily constrains the size of the URL that may be requested, since it must be less than 21 bytes long. A Node.js backend server running on the controlling machine on port 3000 is required for the polyfill to be able to communnicate with the BLE device.</dd>
-      <dd>To start the local backend server, run <code>npm install</code> and <code>node proxies/ble-beacon.js</code>.</dd>
-      <dd>The local backend server has been tested successfully on Linux. It may not run on other platforms.</dd>
+      <dd>To start the local backend server, run <code>npm install</code> and <code>node proxies/ble-beacon.js</code>. The local backend server has been tested successfully on Linux. It may not run on other platforms.</dd>
+
+      <dt>QR Code</dt>
+      <dd>Generates and displays a QR code that represents the URL as an overlay.</dd>
 
       <dt>Window</dt>
       <dd>Opens the presentation in a separate browser window. This mechanism is meant as a fallback that runs everywhere. This fallback would not be an appropriate implementation of the Presentation API though: a Web application calling the Presentation API requests that this content be rendered on a separate display, not in a separate window.</dd>
@@ -49,9 +51,10 @@
       <p><strong>NB:</strong> The polyfill uses a <code>w3c</code> prefix to avoid collisions with native implementations of the Presentation API.</p>
 
       <p>
-        On the controlling side, the Presentation API polyfill must be included together with the Cast sender library to support the Cast presentation mechanism. The application may then create a <code>w3cPresentationRequest</code> instance and call <code>start()</code> on that instance to effectively start the presentation and try to establish a communication channel with the receiving side.
+        On the controlling side, the Presentation API polyfill must be included together with the Cast sender library to support the Cast presentation mechanism and the <a href="https://github.com/davidshimjs/qrcodejs">QRCode.js</a> library for the QR code presentation mechanism. The application may then create a <code>w3cPresentationRequest</code> instance and call <code>start()</code> on that instance to effectively start the presentation and try to establish a communication channel with the receiving side.
       </p>
       <pre><code>
+        &lt;script src="https://davidshimjs.github.io/qrcodejs/qrcode.min.js"&gt;&lt;/script&gt;
         &lt;script src="https://www.gstatic.com/cv/js/sender/v1/cast_sender.js"&gt;&lt;/script&gt;
         &lt;script src="https://mediascape.github.io/presentation-api-polyfill/presentation-api-polyfill.js"&gt;&lt;/script&gt;
         &lt;script type="text/javascript"&gt;

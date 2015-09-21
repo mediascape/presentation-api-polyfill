@@ -2,6 +2,7 @@
 <html>
   <head>
     <script src="https://www.gstatic.com/cv/js/sender/v1/cast_sender.js"></script>
+    <script src="https://davidshimjs.github.io/qrcodejs/qrcode.min.js"></script>
     <script src="../../presentation-api-polyfill.js"></script>
     <title>Presentation API polyfill - Hello world example</title>
   </head>
@@ -19,45 +20,46 @@
     </p>
     <p>
     <p>Current messaging channel status: <span id="status">closed</span>.</p>
-  </body>
-  <script type="text/javascript">
-    window.onload = function () {
-      var openButton = document.getElementById('open');
-      var closeButton = document.getElementById('close');
-      var status = document.getElementById('status');
-      var connection = null;
 
-      openButton.addEventListener('click', function (evt) {
-        evt.preventDefault();
-        var presentationRequest = new w3cPresentationRequest('receiver.html');
-        presentationRequest.start().then(function (presentationConnection) {
-          connection = presentationConnection;
-          openButton.disabled = true;
-          closeButton.disabled = false;
-          connection.onstatechange = function () {
-            console.log('presentation connection state changed to "' + connection.state + '"');
-            status.innerHTML = connection.state;
-            if (connection.state === 'terminated') {
-              connection = null;
-              openButton.disabled = false;
-              closeButton.disabled = true;
-            }
-          };
-        });
-        return false;
-      });
+    <script type="text/javascript">
+      window.onload = function () {
+        var openButton = document.getElementById('open');
+        var closeButton = document.getElementById('close');
+        var status = document.getElementById('status');
+        var connection = null;
 
-      closeButton.addEventListener('click', function (evt) {
-        evt.preventDefault();
-        if (!connection) {
+        openButton.addEventListener('click', function (evt) {
+          evt.preventDefault();
+          var presentationRequest = new w3cPresentationRequest('receiver.html');
+          presentationRequest.start().then(function (presentationConnection) {
+            connection = presentationConnection;
+            openButton.disabled = true;
+            closeButton.disabled = false;
+            connection.onstatechange = function () {
+              console.log('presentation connection state changed to "' + connection.state + '"');
+              status.innerHTML = connection.state;
+              if (connection.state === 'terminated') {
+                connection = null;
+                openButton.disabled = false;
+                closeButton.disabled = true;
+              }
+            };
+          });
           return false;
-        }
-        connection.terminate();
-        connection = null;
-        openButton.disabled = false;
-        closeButton.disabled = true;
-        return false;
-      });
-    };
-  </script>
+        });
+
+        closeButton.addEventListener('click', function (evt) {
+          evt.preventDefault();
+          if (!connection) {
+            return false;
+          }
+          connection.terminate();
+          connection = null;
+          openButton.disabled = false;
+          closeButton.disabled = true;
+          return false;
+        });
+      };
+    </script>
+  </body>
 </html>

@@ -18,6 +18,7 @@ var polyfill = fs.openSync(path.join(root, 'presentation-api-polyfill.js'), 'w')
   path.join(root, 'core.js'),
   path.join(root, 'mechanisms', 'cast.js'),
   path.join(root, 'mechanisms', 'physicalweb.js'),
+  path.join(root, 'mechanisms', 'qrcode.js'),
   path.join(root, 'mechanisms', 'window.js')
 ]
 .forEach(function (file) {

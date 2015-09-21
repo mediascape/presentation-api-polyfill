@@ -22,9 +22,6 @@
  * windows for this mechanism to work properly.
  *
  * Messaging between the window relies on "postMessage" primitives.
- *
- * @constructor
- * @inherits {PresentationMechanism}
  */
 (function () {
   // Retrieve classes that the core of the Presentation API polyfill exposes

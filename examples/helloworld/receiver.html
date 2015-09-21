@@ -10,17 +10,18 @@
     <p>This simple page represents the receiving application that was launched through the Presentation API.</p>
     <p>Depending on the mechanism used to launch that application, the messaging channel may or may not be availble.</p>
     <p>Current messaging channel status: <span id="status">closed</span>.</p>
+
+    <script type="text/javascript">
+      window.onload = function () {
+        var status = document.getElementById('status');
+        navigator.w3cPresentation.receiver.getConnection().then(function (connection) {
+          presentationConnection = connection;
+          status.innerHTML = presentationConnection.state;
+          connection.onstatechange = function () {
+            status.innerHTML = connection.state;
+          };
+        });
+      };
+    </script>
   </body>
-  <script type="text/javascript">
-    window.onload = function () {
-      var status = document.getElementById('status');
-      navigator.w3cPresentation.receiver.getConnection().then(function (connection) {
-        presentationConnection = connection;
-        status.innerHTML = presentationConnection.state;
-        connection.onstatechange = function () {
-          status.innerHTML = connection.state;
-        };
-      });
-    };
-  </script>
 </html>

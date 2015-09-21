@@ -6,7 +6,9 @@ Presentation mechanisms that are currently supported are:
 
 1. **Cast**: Supports presenting to a Chromecast device using Google Chrome's Cast extension.
 2. **Physical Web**: Supports broadcasting the URL to present through a Bluetooth Low-Energy device
-3. **Window**: Opens the presentation in a separate browser window
+3. **QR Code**: Generates and displays the URL that another device may pick up
+4. **Window**: Opens the presentation in a separate browser window
+
 
 ## Usage / Examples
 
@@ -21,7 +23,7 @@ Check the [Presentation API polyfill home page](https://mediascape.github.io/pre
 
 ## License
 
-The source code is available under an [Apache 2.0 license](http://www.apache.org/licenses/LICENSE-2.0).
+The source code is available under an [Apache 2.0 license](http://www.apache.org/licenses/LICENSE-2.0). Parts of the code depends on other third-party open-source libraries that are available under similar license (e.g. MIT).
 
 
 ## Acknowledgements

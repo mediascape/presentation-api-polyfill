@@ -43,6 +43,21 @@
 
 
   /**
+   * Convert the provided URL to an absolute one
+   *
+   * @function
+   * @param {String} url The URL to convert
+   * @return {String} The URL converted to an absolute one
+   */
+  var toAbsolute = function (url) {
+    var a = document.createElement('a');
+    a.href = url;
+    return a.href;
+  };
+
+
+
+  /**
    * Represents the controlling browsing context as seen by the receiving
    * browsing context. In practice, the receiving context does not see
    * anything since it only had access to the URL that was broadcasted by
@@ -104,7 +119,7 @@
         xhr.onload = function () {
           resolve();
         };
-        xhr.send('action=start&url=' + encodeURIComponent(url));
+        xhr.send('action=start&url=' + encodeURIComponent(toAbsolute(url));
         xhr.onerror = function(e) {
           reject(new _DOMException(
             'Unable to start Bluetooth beacon: ' + JSON.stringify(e),
