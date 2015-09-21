@@ -1817,8 +1817,9 @@
  *
  * If the user runs an experimental build of Chromium prepared by Intel Labs,
  * the mechanism will rather open the requested URL in the first screen it
- * finds that is connected through Miracast to the computer running the
- * controlling application, see instructions for the Chromium build at:
+ * finds that is connected through some video port (VGA, HDMI, Miracast) to
+ * the computer running the controlling application, see instructions for the
+ * Chromium build at:
  *
  * http://webscreens.github.io/demo/#binaries
  *

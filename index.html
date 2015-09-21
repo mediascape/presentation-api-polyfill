@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Presentation API polyfill</title>
+  </head>
+  <body>
+    <h1>Presentation API polyfill</h1>
+
+    <p>
+      This page presents a JavaScript polyfill of the <a href="https://w3c.github.io/presentation-api/">Presentation API</a> specification under standardisation within the <a href="https://www.w3.org/2014/secondscreen/">Second Screen Working Group</a> at W3C. The polyfill is mostly intended for the exploration of the ins and outs of the Presentation API. It shows how the Presentation API may be implemented on top of different presentation mechanisms, be them <strong>discovery-based</strong> (the controlling device discovers and controls the second device) or <strong>invitation-based</strong> (the controlling device invites nearby devices to launch an URL), with a view to providing concrete feedback on the specification to the Second Screen Working Group.
+    </p>
+
+    <p>
+      Presentation mechanisms that are currently supported are:
+    </p>
+    <dl>
+      <dt>Cast</dt>
+      <dd>Supports presenting to a Chromecast device. This mechanism only runs in Google Chrome with the <a href="https://chrome.google.com/webstore/detail/google-cast/boadgeojelhgndaghljhdicfkmllpafd?hl=en">Google Cast extension</a> and a Chromecast device connected to the same wireless network as the controlling device.</dd>
+      <dd>Also note that receiving applications must be registered with Google for the Chromecast device to be able to load them.</dd>
+
+      <dt>Physical Web</dt>
+      <dd>Supports broadcasting the URL to present through a Bluetooth Low-Energy (BLE) device. This mechanism heavily constrains the size of the URL that may be requested, since it must be less than 21 bytes long. A Node.js backend server running on the controlling machine on port 3000 is required for the polyfill to be able to communnicate with the BLE device.</dd>
+      <dd>To start the local backend server, run <code>npm install</code> and <code>node proxies/ble-beacon.js</code>.</dd>
+      <dd>The local backend server has been tested successfully on Linux. It may not run on other platforms.</dd>
+
+      <dt>Window</dt>
+      <dd>Opens the presentation in a separate browser window. This mechanism is meant as a fallback that runs everywhere. This fallback would not be an appropriate implementation of the Presentation API though: a Web application calling the Presentation API requests that this content be rendered on a separate display, not in a separate window.</dd>
+      <dd>The window presentation mechanism is unusable on mobile browsers where two tabs cannot be displayed on screen at the same time.</dd>
+      <dd>The window presentation mechanism will most likely fail the first time it is used due to the Web browsing blocking pop-up windows. Allow the controlling app to open pop-up window and try again to fix the problem.</dd>
+    </dl>
+
+    <p>
+      More presentation mechanisms will be added over time. Please note that the polyfill does not properly support advanced features such as presentation reconnections or the possibility to have multiple controllers to a given presentation.
+    </p>
+
+    <section>
+      <h2>Examples</h2>
+
+      <ul>
+        <li><a href="examples/helloworld/index.html">Hello world</a>: A minimal example that uses the polyfill</li>
+        <li><a href="https://webscreens.github.io/slidyremote">Slidy remote</a>: Implementation of a remote controller for a slideshow presentation made with <a href="http://www.w3.org/Talks/Tools/Slidy2/Overview.html">HTML Slidy</a>.</li>
+        <li><a href="https://github.com/mediascape-physical-web">Physical Web for Media Service Discovery</a>: Shows how the Presentation API could perhaps be used to advertise the URL of a companion app to a on-going media show.</li>
+      </ul>
+    </section>
+
+    <section>
+      <h2>Usage</h2>
+
+      <p><strong>NB:</strong> The polyfill uses a <code>w3c</code> prefix to avoid collisions with native implementations of the Presentation API.</p>
+
+      <p>
+        On the controlling side, the Presentation API polyfill must be included together with the Cast sender library to support the Cast presentation mechanism. The application may then create a <code>w3cPresentationRequest</code> instance and call <code>start()</code> on that instance to effectively start the presentation and try to establish a communication channel with the receiving side.
+      </p>
+      <pre><code>
+        &lt;script src="https://www.gstatic.com/cv/js/sender/v1/cast_sender.js"&gt;&lt;/script&gt;
+        &lt;script src="https://mediascape.github.io/presentation-api-polyfill/presentation-api-polyfill.js"&gt;&lt;/script&gt;
+        &lt;script type="text/javascript"&gt;
+          // Start new session.
+          var request = new w3cPresentationRequest('http://mediascapeproject.eu/');
+          request
+            .start()
+            .then(function (connection) {
+              connection.onstatechange = function () {
+                if (connection.state === 'connected') {
+                  console.log('data channel is available');
+                  connection.send('hello receiving side!');
+                }
+                else if (connection.state === 'closed') {
+                  console.log('data channel is closed, presentation may still be running');
+                }
+                else {
+                  console.log('presentation terminated');
+                }
+              };
+              connection.onmessage = function (event) {
+                console.log('received message from receiving side', event.data);
+              };
+            })
+            .catch(function (error) {
+              console.log('could not create presentation', error);
+            });
+        &lt;/script&gt;
+      </code></pre>
+
+      <p>
+        On the receiving side, the Presentation API polyfill must be included together with the Cast receiver library to support the Cast presentation mechanism, although note that the polyfill is useless when invitation-based mechanisms are used (such mechanisms do not know anything about the receiving so cannot connect with them). The receiving application may then monitor incoming presentation connections to be able to exchange messages with the controlling side.
+      </p>
+
+      <pre><code>
+        &lt;script src="https://www.gstatic.com/cast/sdk/libs/receiver/2.0.0/cast_receiver.js"&gt;&lt;/script&gt;
+        &lt;script src="https://mediascape.github.io/presentation-api-polyfill/presentation-api-polyfill.js"&gt;&lt;/script&gt;
+        &lt;script type="text/javascript"&gt;
+          navigator.w3cPresentation.receiver.getSession().then(function (connection) {
+            connection.onstatechange = function () {
+              if (connection.state === 'connected') {
+                connection.send('hello controlling side!');
+              }
+              else if (connection.state === 'closed') {
+                console.log('data channel is closed');
+              }
+              else {
+                console.log('controlling side terminated the presentation');
+              }
+            };
+            connection.onmessage = function (event) {
+              console.log('received message from controlling side', event.data);
+            };
+          });
+        &lt;/script&gt;
+      </code></pre>
+    </section>
+
+    <section>
+      <h2>Implementation details</h2>
+
+      <p>
+        The <a href="https://github.com/mediascape/presentation-api-polyfill">source code of the Presentation API polyfill</a> is available on GitHub</a> under an <a href="LICENSE">Apache version 2.0</a> license.
+      </p>
+
+      <p>
+        The Presentation API JS polyfill closely follows the interfaces and algorithms defined in the latest draft of the <a href="https://w3c.github.io/presentation-api/">Presentation API</a> specification. On top of these interfaces, the Presentation API polyfill exposes a small set of interfaces that may be used to implement new presentation mechanisms. These classes are exposed in the <code>navigator.w3cPresentation.extend</code> namespace. They are:
+      </p>
+
+      <dl>
+        <dt><code>log</code></dt>
+        <dd>Short helper function to log things to the console.</dd>
+
+        <dt><code>_DOMException</code></dt>
+        <dd>Custom implementation of <code>DOMException</code> (pending support from browser vendors)</dd>
+
+        <dt><code>DataChannel</code></dt>
+        <dd>Represents a communication channel that exposes a <code>send()</code> method and <code>message</code> events.</dd>
+
+        <dt><code>RemoteController</code></dt>
+        <dd>Represents a remote controller as seen by the receiving application. This interface mostly only exposes a <code>createDataChannel()</code> method that the Presentation API polyfill running on the receiving side uses to establish the communication channel.</dd>
+
+        <dt><code>Display</code></dt>
+        <dd>Represents a display that is available for presentation. In fact, in the polyfill, classes of displays are also represented as a display. A display can be navigated to a specific URL thanks to the <code>navigate()</code> method it must implement.</dd>
+
+        <dt><code>PresentationMechanism</code></dt>
+        <dd>Main class that additional presentation mechanisms must implement. The <code>getAvailableDisplays()</code> method returns the promise to get a list of available displays. The <code>monitorIncomingControllers()</code> method starts the monitoring of incoming controllers on the receiving side.</dd>
+
+        <dt><code>registerPresentationMechanism()</code></dt>
+        <dd>The method that presentation mechanism must call with a <code>PresentationMechanism</code> instance to register themselves with the polyfill.</dd>
+      </dl>
+    </section>
+
+    <section>
+      <h2>Contact</h2>
+
+      <p>
+        For feedback on the polyfill, use <a href="https://github.com/mediascape/presentation-api-polyfill">GitHub issues</a> or get in touch with <a href="mailto:fd@w3.org">Francois Daoust</a> if you do not wish your comment to appear in public.
+      </p>
+
+      <p>
+        Feedback on the Presentation API itself should be sent to the <a href="mailto:public-secondscreen@w3.org">public mailing-list of the Second Screen Working Group</a>.
+      </p>
+    </section>
+
+    <section>
+      <h2>Acknowledgements</h2>
+      <p>This work was done with support from the European Commission under grant agreement no: 610404 (<a href="http://mediascapeproject.eu/">MediaScape</a>).</p>
+    </section>
+  </body>
+</html>
