@@ -1668,6 +1668,7 @@
   // Retrieve classes that the Presentation API polyfill exposes so that we
   // may define and register our new Physical Web presentation mechanism.
   var ns = navigator.w3cPresentation.extend;
+  var log = ns.log;
   var _DOMException = ns._DOMException;
   var RemoteController = ns.RemoteController;
   var Display = ns.Display;
@@ -1752,8 +1753,8 @@
         xhr.onload = function () {
           resolve();
         };
-        xhr.send('action=start&url=' + encodeURIComponent(toAbsolute(url));
-        xhr.onerror = function(e) {
+        xhr.send('action=start&url=' + encodeURIComponent(toAbsolute(url)));
+        xhr.onerror = function (e) {
           reject(new _DOMException(
             'Unable to start Bluetooth beacon: ' + JSON.stringify(e),
             'OperationError'));
@@ -1794,22 +1795,63 @@
   /**
    * The actual Physical Web presentation mechanism that will be registered
    * on the Presentation API prototype.
+   *
+   * The mechanism relies on the presence of a local backend server running
+   * on port 3000. The mechanism sends a "status" command to that server to
+   * detect whether it is up and running and only report a display if it is.
    */
   var PhysicalWebPresentationMechanism = function () {
     PresentationMechanism.call(this);
     this.name = 'Physical Web presentation mechanism';
 
-    var that = this;
+    var enable = function () {
+      log('info', 'Physical Web backend detected, enable mechanism');
+      enabled = true;
+      pending = false;
+      if (promiseResolve) {
+        promiseResolve([new PhysicalWebDisplay('Physical Web beacon')]);
+        promiseResolve = null;
+      }
+    };
+    var disable = function () {
+      log('info', 'Physical Web backend not available, disable mechanism');
+      enabled = false;
+      pending = false;
+      if (promiseResolve) {
+        promiseResolve([]);
+        promiseResolve = null;
+      }
+    };
+    var promiseResolve = null;
+    var pending = true;
+    var enabled = false;
+    var xhr = new XMLHttpRequest();
+    xhr.timeout = 2000;
+    xhr.onload = enable;
+    xhr.onerror = disable;
+    xhr.ontimeout = disable;
+    xhr.open('POST', 'http://localhost:3000/api/beacon');
+    xhr.setRequestHeader('Content-type', 'application/x-www-form-urlencoded');
+    xhr.send('action=status');
 
     // TODO: can the backend return the list of beacons available by any
     // chance? This could be used to populate the list instead of providing
     // a generic class of displays
     this.getAvailableDisplays = function () {
       return new Promise(function (resolve, reject) {
-        resolve([new PhysicalWebDisplay('Broadcast the URL through a Physical Web beacon')]);
+        promiseResolve = resolve;
+        if (enabled) {
+          resolve([new PhysicalWebDisplay('Physical Web beacon')]);
+          return;
+        }
+        if (!pending) {
+          xhr.timeout = 500;
+          xhr.open('POST', 'http://localhost:3000/api/beacon');
+          xhr.setRequestHeader('Content-type', 'application/x-www-form-urlencoded');
+          xhr.send('action=status');
+        }
       });
     };
-
   };
 
   registerPresentationMechanism(new PhysicalWebPresentationMechanism());

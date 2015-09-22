@@ -21,6 +21,8 @@ app.post('/api/beacon', function(req, res) {
     } else if (req.body.action === "stop") {
         beacon = undefined;
         res.end();
+    } else if (req.body.action === "status") {
+        res.end();
     }
 });
 
