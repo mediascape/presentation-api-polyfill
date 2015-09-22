@@ -11,15 +11,18 @@ var path = require('path');
 var utf8 = { encoding: 'utf-8' };
 
 var root = path.join(__dirname, '..');
-var polyfill = fs.openSync(path.join(root, 'presentation-api-polyfill.js'), 'w');
+var api = path.join(root, 'API');
+var src = path.join(api, 'src');
+var mechanisms = path.join(src, 'mechanisms');
+var polyfill = fs.openSync(path.join(api, 'presentation-api-polyfill.js'), 'w');
 
 [
   path.join(root, 'utils', 'header.js'),
-  path.join(root, 'core.js'),
-  path.join(root, 'mechanisms', 'cast.js'),
-  path.join(root, 'mechanisms', 'physicalweb.js'),
-  path.join(root, 'mechanisms', 'qrcode.js'),
-  path.join(root, 'mechanisms', 'window.js')
+  path.join(src, 'core.js'),
+  path.join(mechanisms, 'cast.js'),
+  path.join(mechanisms, 'physicalweb.js'),
+  path.join(mechanisms, 'qrcode.js'),
+  path.join(mechanisms, 'window.js')
 ]
 .forEach(function (file) {
   var contents = fs.readFileSync(file, utf8);
