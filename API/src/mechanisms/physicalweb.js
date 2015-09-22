@@ -154,7 +154,7 @@
       var xhr = new XMLHttpRequest();
       xhr.open('POST', 'http://localhost:3000/api/beacon');
       xhr.setRequestHeader('Content-type', 'application/x-www-form-urlencoded');
-      xhr.send('action=stop&url=' + encodeURIComponent(url));
+      xhr.send('action=stop');
     };
   };
 
