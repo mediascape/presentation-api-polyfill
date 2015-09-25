@@ -1,10 +1,12 @@
 {
   "name": "presentation-api-polyfill",
+  "respository": "https://github.com/mediascape/presentation-api-polyfill",
   "version": "0.1.0",
   "license": "Apache-2.0",
   "dependencies": {
     "express": "4.4.1",
     "body-parser": "1.12.1",
-    "eddystone-beacon":"*"
+    "eddystone-beacon": "*",
+    "peer-dial": "0.0.4"
   }
 }

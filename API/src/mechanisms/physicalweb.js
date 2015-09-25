@@ -17,7 +17,7 @@
  * To run the Node.js server from the root folder of the Presentation API
  * polyfill repository:
  *
- * node proxies/ble-beacon.js
+ * node Server/ble-beacon.js
  *
  * Ensure that you ran "npm install" on the repository first as that server
  * references third-party libraries.
@@ -81,7 +81,7 @@
      */
     this.createDataChannel = function () {
       return new Promise(function (resolve, reject) {
-        console.info('no possible "native" data channel with Physical Web');
+        log('info', 'no possible "native" data channel with Physical Web');
       });
     };
   };
@@ -120,12 +120,11 @@
         xhr.onload = function () {
           resolve();
         };
-        xhr.send('action=start&url=' + encodeURIComponent(toAbsolute(url)));
         xhr.onerror = function (e) {
-          reject(new _DOMException(
-            'Unable to start Bluetooth beacon: ' + JSON.stringify(e),
-            'OperationError'));
+          reject(new _DOMException('OperationError',
+            'Unable to start Bluetooth beacon: ' + JSON.stringify(e)));
         };
+        xhr.send('action=start&url=' + encodeURIComponent(toAbsolute(url)));
       });
     };
 
@@ -141,7 +140,7 @@
      */
     this.createDataChannel = function () {
       return new Promise(function (resolve, reject) {
-        console.info('no possible "native" data channel with Physical Web');
+        log('info', 'no possible "native" data channel with Physical Web');
       });
     };
 
