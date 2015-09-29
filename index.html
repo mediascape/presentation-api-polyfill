@@ -7,32 +7,45 @@
     <h1>Presentation API polyfill</h1>
 
     <p>
-      This page presents a JavaScript polyfill of the <a href="https://w3c.github.io/presentation-api/">Presentation API</a> specification under standardisation within the <a href="https://www.w3.org/2014/secondscreen/">Second Screen Working Group</a> at W3C. The polyfill is mostly intended for the exploration of the ins and outs of the Presentation API. It shows how the Presentation API may be implemented on top of different presentation mechanisms, be them <strong>discovery-based</strong> (the controlling device discovers and controls the second device) or <strong>invitation-based</strong> (the controlling device invites nearby devices to launch an URL), with a view to providing concrete feedback on the specification to the Second Screen Working Group.
+      This page presents a JavaScript polyfill of the <a href="https://w3c.github.io/presentation-api/">Presentation API</a> specification under standardisation within the <a href="https://www.w3.org/2014/secondscreen/">Second Screen Working Group</a> at W3C.
+    </p>
+
+    <p>
+      The polyfill is not intended for use in production. It is meant to explore various discovery and launch mechanisms that the Presentation API could be built upon, be them <strong>discovery-based</strong> (the controlling device discovers and controls the second device) or <strong>invitation-based</strong> (the controlling device invites nearby devices to launch an URL), with a view to providing concrete feedback on the specification to the Second Screen Working Group.
     </p>
 
     <p>
       Presentation mechanisms that are currently supported are:
     </p>
     <dl>
-      <dt>Cast</dt>
+      <dt id="cast">Cast</dt>
       <dd>Supports presenting to a Chromecast device. This mechanism only runs in Google Chrome with the <a href="https://chrome.google.com/webstore/detail/google-cast/boadgeojelhgndaghljhdicfkmllpafd?hl=en">Google Cast extension</a> and a Chromecast device connected to the same wireless network as the controlling device.</dd>
       <dd>Also note that receiving applications must be registered with Google for the Chromecast device to be able to load them.</dd>
 
-      <dt>Physical Web</dt>
+      <dt id="physicalweb">Physical Web</dt>
       <dd>Supports broadcasting the URL to present through a Bluetooth Low-Energy (BLE) device. This mechanism heavily constrains the size of the URL that may be requested, since it must be less than 21 bytes long. A Node.js backend server running on the controlling machine on port 3000 is required for the polyfill to be able to communnicate with the BLE device.</dd>
       <dd>To start the local backend server, run <code>npm install</code> and <code>node Server/ble-beacon.js</code>. The local backend server has been tested successfully on Linux. It may not run on other platforms.</dd>
 
-      <dt>QR Code</dt>
+      <dt id="dial">DIAL</dt>
+      <dd>Supports discovery of DIAL devices and of a specific set of DIAL applications that can load and render a URL on some second screen. A Node.js DIAL backend server running on the controlling machine on port 3001 is required for the polyfill to be able to discover and control DIAL devices.</dd>
+      <dd>To start the local backend server, run <code>npm install</code> and <code>node Server/dial-proxy.js</code>. The local backend server should work well across platforms.</dd>
+
+      <dt id="hbbtv">HbbTV 2.0</dt>
+      <dd>Supports discovery of HbbTV 2.0 devices and starting a URL on a user-selected HbbTV device.</dd>
+      <dd>The HbbTV 2.0 mechanism is a specific case of the DIAL mechanism that uses the "HbbTV" DIAL application and an XML AIT to load the URL to present. The same backend server as for the DIAL mechanism is required to enable that mechanism.</dd>
+
+      <dt id="qrcode">QR Code</dt>
       <dd>Generates and displays a QR code that represents the URL as an overlay.</dd>
 
-      <dt>Window</dt>
+      <dt id="window">Window</dt>
       <dd>Opens the presentation in a separate browser window. This mechanism is meant as a fallback that runs everywhere. This fallback would not be an appropriate implementation of the Presentation API though: a Web application calling the Presentation API requests that this content be rendered on a separate display, not in a separate window.</dd>
       <dd>The window presentation mechanism is unusable on mobile browsers where two tabs cannot be displayed on screen at the same time.</dd>
       <dd>The window presentation mechanism will most likely fail the first time it is used due to the Web browsing blocking pop-up windows. Allow the controlling app to open pop-up window and try again to fix the problem.</dd>
     </dl>
 
     <p>
-      More presentation mechanisms will be added over time. Please note that the polyfill does not properly support advanced features such as presentation reconnections or the possibility to have multiple controllers to a given presentation.
+      <strong>Important:</strong>
+      The establishment of a communication channel between the peers is either not fully implemented (Cast, Window) or not implemented at all (Physical Web, DIAL, HbbTV, QR Code). The polyfill will be improved over time.
     </p>
 
     <section>
@@ -48,7 +61,7 @@
     <section>
       <h2>Usage</h2>
 
-      <p><strong>NB:</strong> The polyfill uses a <code>w3c</code> prefix to avoid collisions with native implementations of the Presentation API.</p>
+      <p><strong>NB:</strong> The polyfill uses a <code>w3c</code> prefix to avoid collisions with native implementations of the Presentation API.</p>      
 
       <p>
         The Presentation API polyfill is a standalone JavaScript file, available at:
@@ -56,67 +69,105 @@
       </p>
 
       <p>
-        Additional dependencies need to be included to enable some of the presentation mechanisms supported by the polyfill. On the controlling side, the Presentation API polyfill must be included together with the Cast sender library to support the Cast presentation mechanism and the <a href="https://github.com/davidshimjs/qrcodejs">QRCode.js</a> library for the QR code presentation mechanism. The application may then create a <code>w3cPresentationRequest</code> instance and call <code>start()</code> on that instance to effectively start the presentation and try to establish a communication channel with the receiving side.
+        Additional dependencies need to be included to enable some of the presentation mechanisms supported by the polyfill.
       </p>
-      <pre><code>
-        &lt;script src="https://davidshimjs.github.io/qrcodejs/qrcode.min.js"&gt;&lt;/script&gt;
-        &lt;script src="https://www.gstatic.com/cv/js/sender/v1/cast_sender.js"&gt;&lt;/script&gt;
-        &lt;script src="https://mediascape.github.io/presentation-api-polyfill/API/presentation-api-polyfill.js"&gt;&lt;/script&gt;
-        &lt;script type="text/javascript"&gt;
-          // Start new session.
-          var request = new w3cPresentationRequest('http://mediascapeproject.eu/');
-          request
-            .start()
-            .then(function (connection) {
+
+
+      <section>
+        <h3>Controlling code</h3>
+        <p>
+          On the controlling side, the Presentation API polyfill must be included together with the Cast sender library to support the Cast presentation mechanism and the <a href="https://github.com/davidshimjs/qrcodejs">QRCode.js</a> library for the QR code presentation mechanism. The application may then create a <code>w3cPresentationRequest</code> instance and call <code>start()</code> on that instance to effectively start the presentation and try to establish a communication channel with the receiving side.
+        </p>
+        <pre><code>
+          &lt;script src="https://davidshimjs.github.io/qrcodejs/qrcode.min.js"&gt;&lt;/script&gt;
+          &lt;script src="https://www.gstatic.com/cv/js/sender/v1/cast_sender.js"&gt;&lt;/script&gt;
+          &lt;script src="https://mediascape.github.io/presentation-api-polyfill/API/presentation-api-polyfill.js"&gt;&lt;/script&gt;
+          &lt;script type="text/javascript"&gt;
+            // Start new session.
+            var request = new w3cPresentationRequest('http://mediascapeproject.eu/');
+            request
+              .start()
+              .then(function (connection) {
+                connection.onstatechange = function () {
+                  if (connection.state === 'connected') {
+                    console.log('data channel is available');
+                    connection.send('hello receiving side!');
+                  }
+                  else if (connection.state === 'closed') {
+                    console.log('data channel is closed, presentation may still be running');
+                  }
+                  else {
+                    console.log('presentation terminated');
+                  }
+                };
+                connection.onmessage = function (event) {
+                  console.log('received message from receiving side', event.data);
+                };
+              })
+              .catch(function (error) {
+                console.log('could not create presentation', error);
+              });
+          &lt;/script&gt;
+        </code></pre>
+
+        <p>
+          Mechanisms that cannot be fully implemented within the Web runtime make use of a local Node.js backends to accomplish the tasks that they cannot achieve on their own. To launch these backends, first fetch the required code:
+        </p>
+
+        <pre><code>
+          git clone https://github.com/mediascape/presentation-api-polyfill.git
+          cd presentation-api-polyfill
+          npm install
+        </code></pre>
+
+        <p>
+          Then run each backend server in its own command-line window. To enable the Physical Web mechanism, run:
+        </p>
+        <pre><code>
+          node Server/ble-beacon.js
+        </code></pre>
+        <p>
+          To enable the DIAL and HbbTV 2.0 mechanisms, run:
+        </p>
+        <pre><code>
+          node Server/dial-proxy.js
+        </code></pre>
+      </section>
+
+      <section>
+        <h3>Receiving code</h3>
+
+        <p>
+          On the receiving side, the Presentation API polyfill must be included together with the Cast receiver library to support the Cast presentation mechanism, although note that the polyfill is useless when invitation-based mechanisms are used (such mechanisms do not know anything about the receiving so cannot connect with them). The receiving application may then monitor incoming presentation connections to be able to exchange messages with the controlling side.
+        </p>
+
+        <pre><code>
+          &lt;script src="https://www.gstatic.com/cast/sdk/libs/receiver/2.0.0/cast_receiver.js"&gt;&lt;/script&gt;
+          &lt;script src="https://mediascape.github.io/presentation-api-polyfill/API/presentation-api-polyfill.js"&gt;&lt;/script&gt;
+          &lt;script type="text/javascript"&gt;
+            navigator.w3cPresentation.receiver.getSession().then(function (connection) {
               connection.onstatechange = function () {
                 if (connection.state === 'connected') {
-                  console.log('data channel is available');
-                  connection.send('hello receiving side!');
+                  connection.send('hello controlling side!');
                 }
                 else if (connection.state === 'closed') {
-                  console.log('data channel is closed, presentation may still be running');
+                  console.log('data channel is closed');
                 }
                 else {
-                  console.log('presentation terminated');
+                  console.log('controlling side terminated the presentation');
                 }
               };
               connection.onmessage = function (event) {
-                console.log('received message from receiving side', event.data);
+                console.log('received message from controlling side', event.data);
               };
-            })
-            .catch(function (error) {
-              console.log('could not create presentation', error);
             });
-        &lt;/script&gt;
-      </code></pre>
-
-      <p>
-        On the receiving side, the Presentation API polyfill must be included together with the Cast receiver library to support the Cast presentation mechanism, although note that the polyfill is useless when invitation-based mechanisms are used (such mechanisms do not know anything about the receiving so cannot connect with them). The receiving application may then monitor incoming presentation connections to be able to exchange messages with the controlling side.
-      </p>
-
-      <pre><code>
-        &lt;script src="https://www.gstatic.com/cast/sdk/libs/receiver/2.0.0/cast_receiver.js"&gt;&lt;/script&gt;
-        &lt;script src="https://mediascape.github.io/presentation-api-polyfill/API/presentation-api-polyfill.js"&gt;&lt;/script&gt;
-        &lt;script type="text/javascript"&gt;
-          navigator.w3cPresentation.receiver.getSession().then(function (connection) {
-            connection.onstatechange = function () {
-              if (connection.state === 'connected') {
-                connection.send('hello controlling side!');
-              }
-              else if (connection.state === 'closed') {
-                console.log('data channel is closed');
-              }
-              else {
-                console.log('controlling side terminated the presentation');
-              }
-            };
-            connection.onmessage = function (event) {
-              console.log('received message from controlling side', event.data);
-            };
-          });
-        &lt;/script&gt;
-      </code></pre>
+          &lt;/script&gt;
+        </code></pre>
+      </section>
     </section>
+
+
+
 
     <section>
       <h2>Implementation details</h2>
