@@ -180,7 +180,7 @@
 
 
   /**
-   * IRT's FireTV Amazon dongle DIAL application
+   * IRT's Amazon FireTV dongle DIAL application
    *
    * Supports the custom Android-based DIAL application developed by
    * IRT as part of MediaScape to present content on an Amazon FireTV dongle.
@@ -189,7 +189,7 @@
    * @inherits {DialApplication}
    */
   var IRTFireTVDialApplication = function () {
-    DialApplication.call(this, 'IRTFireTV');
+    DialApplication.call(this, 'mediaScapeWebView');
 
     this.contentType = 'application/json';
     this.getStartData = function (url) {
