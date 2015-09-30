@@ -24,7 +24,7 @@
  *
  * where "app" is an instance of DialApplication
  **/
-(function () { 
+(function () {
   // Retrieve classes that the core of the Presentation API polyfill exposes
   // to defined and register this presentation mechanism
   var ns = navigator.w3cPresentation.extend;
@@ -123,11 +123,20 @@
    * with the Presentation API, so the application will be
    * broadcast-independent in practice.
    *
+   * The appId and orgId still need to be passed over to the HbbTV DIAL app,
+   * which means that user agents will have to register themselves with HbbTV
+   * one way or the other, perhaps using the same appId for all URLs loaded
+   * with the Presentation API.
+   *
    * @class
    * @inherits {DialApplication}
    */
   var HbbTVDialApplication = function () {
     DialApplication.call(this, 'HbbTV');
+
+    var orgId = '123';
+    var appId = '456';
+
     this.contentType = 'text/xml';
     this.getStartData = function (url) {
       return '<?xml version="1.0" encoding="UTF-8"?>' +
@@ -136,6 +145,10 @@
             '<mhp:ApplicationList>' +
               '<mhp:Application>' +
                 '<mhp:appName Language="eng"></mhp:appName>' +
+                '<mhp:applicationIdentifier>' +
+                  '<mhp:orgId>' + orgId + '</mhp:orgId>' +
+                  '<mhp:appId>' + appId + '</mhp:appId>' +
+                  '</mhp:applicationIdentifier>' +
                 '<mhp:applicationDescriptor>' +
                   '<mhp:type>' +
                     '<mhp:OtherApp>application/vnd.hbbtv.xhtml+xml</mhp:OtherApp>' +
@@ -162,6 +175,31 @@
         '</mhp:ServiceDiscovery>';
     };
   };
+
+
+
+
+  /**
+   * IRT's FireTV Amazon dongle DIAL application
+   *
+   * Supports the custom Android-based DIAL application developed by
+   * IRT as part of MediaScape to present content on an Amazon FireTV dongle.
+   *
+   * @class
+   * @inherits {DialApplication}
+   */
+  var IRTFireTVDialApplication = function () {
+    DialApplication.call(this, 'IRTFireTV');
+
+    this.contentType = 'application/json';
+    this.getStartData = function (url) {
+      return JSON.stringify({
+        url: url
+      }, null, 2);
+    };
+  };
+
+
 
 
   /**
@@ -375,6 +413,7 @@
   registerPresentationMechanism(new DialPresentationMechanism());
 
 
-  // Register the HbbTV DIAL application
+  // Register supported DIAL applications
   navigator.w3cPresentation.registerDialApplication(new HbbTVDialApplication());
+  navigator.w3cPresentation.registerDialApplication(new IRTFireTVDialApplication());
 })();

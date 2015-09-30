@@ -20,6 +20,7 @@ var polyfill = fs.openSync(path.join(api, 'presentation-api-polyfill.js'), 'w');
   path.join(root, 'utils', 'header.js'),
   path.join(src, 'core.js'),
   path.join(mechanisms, 'cast.js'),
+  path.join(mechanisms, 'dial.js'),
   path.join(mechanisms, 'physicalweb.js'),
   path.join(mechanisms, 'qrcode.js'),
   path.join(mechanisms, 'window.js')
