@@ -601,7 +601,7 @@
 
 
   /**********************************************************************
-  PresentationConnectEvent interface
+  PresentationConnectionAvailableEvent interface
   **********************************************************************/
 
   /**
@@ -613,7 +613,7 @@
    * @param {connection:PresentationConnection} eventInitDict An object that
    * points to the presentation connection to associate with the event
    */
-  var PresentationConnectEvent = function (eventInitDict) {
+  var PresentationConnectionAvailableEvent = function (eventInitDict) {
     this.connection = eventInitDict.connection;
   };
 
@@ -964,7 +964,7 @@
         // Queue a task to fire an event named "connection" at
         // presentationRequest with S as its connection attribute. 
         queueTask(function () {
-          var connectEvent = new PresentationConnectEvent({
+          var connectEvent = new PresentationConnectionAvailableEvent({
             connection: connection
           });
           if (thisPresentationRequest.onconnection) {
