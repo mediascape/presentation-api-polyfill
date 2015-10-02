@@ -601,7 +601,7 @@
 
 
   /**********************************************************************
-  PresentationConnectionEvent interface
+  PresentationConnectEvent interface
   **********************************************************************/
 
   /**
@@ -613,7 +613,7 @@
    * @param {connection:PresentationConnection} eventInitDict An object that
    * points to the presentation connection to associate with the event
    */
-  var PresentationConnectionEvent = function (eventInitDict) {
+  var PresentationConnectEvent = function (eventInitDict) {
     this.connection = eventInitDict.connection;
   };
 
@@ -687,7 +687,7 @@
        *
        * @type {EventHandler}
        */
-      this.onconnection = null;
+      this.onconnectionavailable = null;
 
 
       /**
@@ -964,7 +964,7 @@
         // Queue a task to fire an event named "connection" at
         // presentationRequest with S as its connection attribute. 
         queueTask(function () {
-          var connectEvent = new PresentationConnectionEvent({
+          var connectEvent = new PresentationConnectEvent({
             connection: connection
           });
           if (thisPresentationRequest.onconnection) {
@@ -1020,7 +1020,7 @@
      *
      * @type {EventHandler}
      */
-    this.onconnection = null;
+    this.onconnectionavailable = null;
 
 
     /**
@@ -1141,8 +1141,8 @@
                 id: connection.id,
                 connection: connection
               });
-              if (thisPresentationReceiver.onconnection) {
-                thisPresentationReceiver.onconnection();
+              if (thisPresentationReceiver.onconnectionavailable) {
+                thisPresentationReceiver.onconnectionavailable();
               }
               if (pendingResolveFunction) {
                 pendingResolveFunction(connection);
