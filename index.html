@@ -22,10 +22,6 @@
       <dd>Supports presenting to a Chromecast device. This mechanism only runs in Google Chrome with the <a href="https://chrome.google.com/webstore/detail/google-cast/boadgeojelhgndaghljhdicfkmllpafd?hl=en">Google Cast extension</a> and a Chromecast device connected to the same wireless network as the controlling device.</dd>
       <dd>Also note that receiving applications must be registered with Google for the Chromecast device to be able to load them.</dd>
 
-      <dt id="physicalweb">Physical Web</dt>
-      <dd>Supports broadcasting the URL to present through a Bluetooth Low-Energy (BLE) device. This mechanism heavily constrains the size of the URL that may be requested, since it must be less than 21 bytes long. A Node.js backend server running on the controlling machine on port 3000 is required for the polyfill to be able to communnicate with the BLE device.</dd>
-      <dd>To start the local backend server, run <code>npm install</code> and <code>node Server/ble-beacon.js</code>. The local backend server has been tested successfully on Linux. It may not run on other platforms.</dd>
-
       <dt id="dial">DIAL</dt>
       <dd>Supports discovery of DIAL devices and of a specific set of DIAL applications that can load and render a URL on some second screen. A Node.js DIAL backend server running on the controlling machine on port 3001 is required for the polyfill to be able to discover and control DIAL devices.</dd>
       <dd>To start the local backend server, run <code>npm install</code> and <code>node Server/dial-proxy.js</code>. The local backend server should work well across platforms.</dd>
@@ -37,6 +33,10 @@
       <dt id="qrcode">QR Code</dt>
       <dd>Generates and displays a QR code that represents the URL as an overlay.</dd>
 
+      <dt id="physicalweb">Physical Web</dt>
+      <dd>Supports broadcasting the URL to present through a Bluetooth Low-Energy (BLE) device. This mechanism heavily constrains the size of the URL that may be requested, since it must be less than 21 bytes long. A Node.js backend server running on the controlling machine on port 3000 is required for the polyfill to be able to communnicate with the BLE device.</dd>
+      <dd>To start the local backend server, run <code>npm install</code> and <code>node Server/ble-beacon.js</code>. The local backend server has been tested successfully on Linux. It may not run on other platforms.</dd>
+
       <dt id="window">Window</dt>
       <dd>Opens the presentation in a separate browser window. This mechanism is meant as a fallback that runs everywhere. This fallback would not be an appropriate implementation of the Presentation API though: a Web application calling the Presentation API requests that this content be rendered on a separate display, not in a separate window.</dd>
       <dd>The window presentation mechanism is unusable on mobile browsers where two tabs cannot be displayed on screen at the same time.</dd>
@@ -45,7 +45,7 @@
 
     <p>
       <strong>Important:</strong>
-      The establishment of a communication channel between the peers is either not fully implemented (Cast, Window) or not implemented at all (Physical Web, DIAL, HbbTV, QR Code). Advanced features such as reconnection to running presentations or even terminating a presentation is not supported either. The polyfill will be improved over time.
+      The establishment of a communication channel between the peers is either not fully implemented (Cast, Window) or simply not available at all when it cannot be established automatically (DIAL, HbbTV, QR Code). The polyfill uses an <code>isChannelOptional</code> presentation request option flag to let the calling app specify whether it needs a communication channel (the default) or will handle the communication on its own. Advanced features such as reconnection to running presentations or even terminating a presentation is not supported either. The polyfill will be improved over time.
     </p>
 
     <section>
@@ -84,7 +84,8 @@
           &lt;script src="https://mediascape.github.io/presentation-api-polyfill/API/presentation-api-polyfill.js"&gt;&lt;/script&gt;
           &lt;script type="text/javascript"&gt;
             // Start new session.
-            var request = new w3cPresentationRequest('http://mediascapeproject.eu/');
+            var request = new w3cPresentationRequest(
+              'http://mediascapeproject.eu/', { isChannelOptional: true });
             request
               .start()
               .then(function (connection) {

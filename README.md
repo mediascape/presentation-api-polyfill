@@ -5,13 +5,13 @@ This repository contains a JavaScript polyfill of the [Presentation API](https:/
 Presentation mechanisms that are currently supported are:
 
 1. **Cast**: Supports presenting to a Chromecast device using Google Chrome's Cast extension.
-2. **Physical Web**: Supports broadcasting the URL to present through a Bluetooth Low-Energy device
-3. **DIAL**: Supports presenting to a DIAL devices with a specific set of DIAL applications (that may be specified at runtime)
-4. **HbbTV 2.0**: Supports presenting to an HbbTV 2.0 device (HbbTV is a specific case of the DIAL mechanism in practice)
+2. **DIAL**: Supports presenting to a DIAL devices with a specific set of DIAL applications (that may be specified at runtime)
+3. **HbbTV 2.0**: Supports presenting to an HbbTV 2.0 device (HbbTV is a specific case of the DIAL mechanism in practice)
 4. **QR Code**: Generates and displays the URL that another device may pick up
-5. **Window**: Opens the presentation in a separate browser window
+5. **Physical Web**: Supports broadcasting the URL to present through a Bluetooth Low-Energy device
+6. **Window**: Opens the presentation in a separate browser window
 
-**Important**: The establishment of a communication channel between the peers is either not fully implemented (Cast, Window) or not implemented at all (Physical Web, DIAL, HbbTV, QR Code). The polyfill will be improved over time.
+**Important**: The establishment of a communication channel between the peers is either not fully implemented (Cast, Window) or simply not available at all when it cannot be established automatically (DIAL, HbbTV, QR Code). The polyfill uses an `isChannelOptional` presentation request option flag to let the calling app specify whether it needs a communication channel (the default) or will handle the communication on its own.
 
 
 ## Usage / Examples
