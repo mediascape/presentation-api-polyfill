@@ -1,7 +1,7 @@
 /**
  * @file HTTP server that exposes the list of DIAL devices found around
  * @copyright 2015 W3C (MIT, ERCIM, Keio, Beihang)
- * @license Apache-2.0
+ * @license W3C Software and Document License
  * @author François Daoust <fd@w3.org>
  *
  * The HTTP server searches for DIAL devices on a regular basis and returns the

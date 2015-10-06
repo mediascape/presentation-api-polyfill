@@ -1,7 +1,7 @@
 /**
  * @file Presentation API polyfill
  * @copyright 2015 W3C (MIT, ERCIM, Keio, Beihang)
- * @license Apache-2.0
+ * @license W3C Software and Document License
  * @author François Daoust <fd@w3.org>
  *
  * This is a polyfill of the Presentation API specification that embeds all

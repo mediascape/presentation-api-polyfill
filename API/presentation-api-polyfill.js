@@ -1,7 +1,7 @@
 /**
  * @file Presentation API polyfill
  * @copyright 2015 W3C (MIT, ERCIM, Keio, Beihang)
- * @license Apache-2.0
+ * @license W3C Software and Document License
  * @author François Daoust <fd@w3.org>
  *
  * This is a polyfill of the Presentation API specification that embeds all
@@ -38,7 +38,7 @@
 /**
  * @file Core classes of the Presentation API polyill
  * @copyright 2015 W3C (MIT, ERCIM, Keio, Beihang)
- * @license Apache-2.0
+ * @license W3C Software and Document License
  * @author François Daoust <fd@w3.org>
  *
  * This file implements the helper functions and base classes that actual
@@ -1228,7 +1228,7 @@
 /**
  * @file Google Cast presentation mechanism for the Presentation API polyfill
  * @copyright 2015 W3C (MIT, ERCIM, Keio, Beihang)
- * @license Apache-2.0
+ * @license W3C Software and Document License
  * @author François Daoust <fd@w3.org>
  *
  * This mechanism allows a user to request display of Web content on
@@ -1634,7 +1634,7 @@
 /**
  * @file DIAL presentation mechanism for the Presentation API polyfill
  * @copyright 2015 W3C (MIT, ERCIM, Keio, Beihang)
- * @license Apache-2.0
+ * @license W3C Software and Document License
  * @author François Daoust <fd@w3.org>
  *
  * This mechanism allows a user to request display of Web content on
@@ -2057,7 +2057,7 @@
 /**
  * @file Physical Web mechanism for the Presentation API polyfill
  * @copyright 2015 W3C (MIT, ERCIM, Keio, Beihang)
- * @license Apache-2.0
+ * @license W3C Software and Document License
  * @author François Daoust <fd@w3.org>
  * @author Dominique Hazaël-Massieux <dom@w3.org>
  *
@@ -2285,7 +2285,7 @@
 /**
  * @file QR code presentation mechanism for the Presentation API polyfill
  * @copyright 2015 W3C (MIT, ERCIM, Keio, Beihang)
- * @license Apache-2.0
+ * @license W3C Software and Document License
  * @author François Daoust <fd@w3.org>
  *
  * The QR code presentation mechanism allows a user to generate and display
@@ -2488,7 +2488,7 @@
 /**
  * @file Window presentation mechanism for the Presentation API polyfill
  * @copyright 2015 W3C (MIT, ERCIM, Keio, Beihang)
- * @license Apache-2.0
+ * @license W3C Software and Document License
  * @author François Daoust <fd@w3.org>
  *
  * The window presentation mechanism allows a user to open a new window on

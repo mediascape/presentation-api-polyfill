@@ -1,7 +1,7 @@
 /**
  * @file QR code presentation mechanism for the Presentation API polyfill
  * @copyright 2015 W3C (MIT, ERCIM, Keio, Beihang)
- * @license Apache-2.0
+ * @license W3C Software and Document License
  * @author François Daoust <fd@w3.org>
  *
  * The QR code presentation mechanism allows a user to generate and display

@@ -27,7 +27,7 @@ Check the [Presentation API polyfill home page](https://mediascape.github.io/pre
 
 ## License
 
-The source code is available under an [Apache 2.0 license](http://www.apache.org/licenses/LICENSE-2.0). Parts of the code depends on other third-party open-source libraries that are available under similar license (e.g. MIT).
+The source code is available under a [W3C Software and Document License](http://www.w3.org/Consortium/Legal/2015/copyright-software-and-document). Parts of the code depends on other third-party open-source libraries that are available under similar license (e.g. MIT).
 
 
 ## Acknowledgements
