@@ -327,10 +327,14 @@
      * select to launch a presentation.
      *
      * @function
+     * @param {String} url The URL that is to be displayed
+     * @param {Object} options Presentation options such as the possibility to
+     *   include displays and/or mechanisms for which communication channels are
+     *   not available.
      * @return {Promise<Array(Display)} The promise to get the current list of
      * available presentation displays
      */
-    this.getAvailableDisplays = function () {
+    this.getAvailableDisplays = function (url, options) {
       return new Promise(function (resolve, reject) {
         resolve([]);
       });
@@ -596,6 +600,10 @@
    *
    * @constructor
    * @param {String} url The URL to present when the intent is to be started
+   * @param {Object} options Request options. The polyfill understands the
+   *  non-standard "isChannelOptional" flag, which defaults to "false" and may
+   *  be set to "true" to also include second screens for which it cannot
+   *  establish a communication channel all by itself
    */
   var PresentationRequest = (function () {
     /**
@@ -642,7 +650,7 @@
     /**
      * The actual PresentationRequest interface
      */
-    var PresentationRequest = function (url) {
+    var PresentationRequest = function (url, options) {
       /**
        * Fired when the presentation connection associated with the object is
        * created, following a call to start, reconnect or, for the default
@@ -793,7 +801,7 @@
           queueTask(function () {
             log('get list of available displays from registered mechanisms');
             Promise.all(registeredMechanisms.map(function (mechanism) {
-              return mechanism.getAvailableDisplays();
+              return mechanism.getAvailableDisplays(url, options);
             })).then(function (lists) {
               // Flattten the lists of displays
               var newDisplays = lists.reduce(function (a, b) {

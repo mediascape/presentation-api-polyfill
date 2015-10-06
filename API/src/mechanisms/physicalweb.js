@@ -192,7 +192,7 @@
     var pending = true;
     var enabled = false;
     var xhr = new XMLHttpRequest();
-    xhr.timeout = 2000;
+    xhr.timeout = 500;
     xhr.onload = enable;
     xhr.onerror = disable;
     xhr.ontimeout = disable;
@@ -203,15 +203,19 @@
     // TODO: can the backend return the list of beacons available by any
     // chance? This could be used to populate the list instead of providing
     // a generic class of displays
-    this.getAvailableDisplays = function () {
+    this.getAvailableDisplays = function (url, options) {
+      options = options || {};
       return new Promise(function (resolve, reject) {
-        promiseResolve = resolve;
+        if (!options.isChannelOptional) {
+          resolve([]);
+          return;
+        }
         if (enabled) {
           resolve([new PhysicalWebDisplay('Physical Web beacon')]);
           return;
         }
+        promiseResolve = resolve;
         if (!pending) {
-          xhr.timeout = 500;
           xhr.open('POST', 'http://localhost:3000/api/beacon');
           xhr.setRequestHeader('Content-type', 'application/x-www-form-urlencoded');
           xhr.send('action=status');

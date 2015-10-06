@@ -364,10 +364,14 @@
      * select to launch a presentation.
      *
      * @function
+     * @param {String} url The URL that is to be displayed
+     * @param {Object} options Presentation options such as the possibility to
+     *   include displays and/or mechanisms for which communication channels are
+     *   not available.
      * @return {Promise<Array(Display)} The promise to get the current list of
      * available presentation displays
      */
-    this.getAvailableDisplays = function () {
+    this.getAvailableDisplays = function (url, options) {
       return new Promise(function (resolve, reject) {
         resolve([]);
       });
@@ -633,6 +637,10 @@
    *
    * @constructor
    * @param {String} url The URL to present when the intent is to be started
+   * @param {Object} options Request options. The polyfill understands the
+   *  non-standard "isChannelOptional" flag, which defaults to "false" and may
+   *  be set to "true" to also include second screens for which it cannot
+   *  establish a communication channel all by itself
    */
   var PresentationRequest = (function () {
     /**
@@ -679,7 +687,7 @@
     /**
      * The actual PresentationRequest interface
      */
-    var PresentationRequest = function (url) {
+    var PresentationRequest = function (url, options) {
       /**
        * Fired when the presentation connection associated with the object is
        * created, following a call to start, reconnect or, for the default
@@ -830,7 +838,7 @@
           queueTask(function () {
             log('get list of available displays from registered mechanisms');
             Promise.all(registeredMechanisms.map(function (mechanism) {
-              return mechanism.getAvailableDisplays();
+              return mechanism.getAvailableDisplays(url, options);
             })).then(function (lists) {
               // Flattten the lists of displays
               var newDisplays = lists.reduce(function (a, b) {
@@ -1970,7 +1978,13 @@
     })();
     checkLocalProxyPresence(2000).catch(function () {});
 
-    this.getAvailableDisplays = function () {
+    this.getAvailableDisplays = function (url, options) {
+      options = options || {};
+      if (!options.isChannelOptional) {
+        return new Promise(function (resolve, reject) {
+          resolve([]);
+        });
+      }
       return checkLocalProxyPresence(500)
         .then(function () {
           return new Promise(function (resolve, reject) {
@@ -2248,7 +2262,7 @@
     var pending = true;
     var enabled = false;
     var xhr = new XMLHttpRequest();
-    xhr.timeout = 2000;
+    xhr.timeout = 500;
     xhr.onload = enable;
     xhr.onerror = disable;
     xhr.ontimeout = disable;
@@ -2259,15 +2273,19 @@
     // TODO: can the backend return the list of beacons available by any
     // chance? This could be used to populate the list instead of providing
     // a generic class of displays
-    this.getAvailableDisplays = function () {
+    this.getAvailableDisplays = function (url, options) {
+      options = options || {};
       return new Promise(function (resolve, reject) {
-        promiseResolve = resolve;
+        if (!options.isChannelOptional) {
+          resolve([]);
+          return;
+        }
         if (enabled) {
           resolve([new PhysicalWebDisplay('Physical Web beacon')]);
           return;
         }
+        promiseResolve = resolve;
         if (!pending) {
-          xhr.timeout = 500;
           xhr.open('POST', 'http://localhost:3000/api/beacon');
           xhr.setRequestHeader('Content-type', 'application/x-www-form-urlencoded');
           xhr.send('action=status');
@@ -2464,9 +2482,11 @@
 
     var that = this;
 
-    this.getAvailableDisplays = function () {
+    this.getAvailableDisplays = function (url, options) {
+      options = options || {};
       return new Promise(function (resolve, reject) {
-        if (typeof QRCode !== 'undefined') {
+        if (options.isChannelOptional &&
+            (typeof QRCode !== 'undefined')) {
           resolve([new QRCodeDisplay('QR code')]);
         }
         else {

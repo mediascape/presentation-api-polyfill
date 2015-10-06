@@ -180,9 +180,11 @@
 
     var that = this;
 
-    this.getAvailableDisplays = function () {
+    this.getAvailableDisplays = function (url, options) {
+      options = options || {};
       return new Promise(function (resolve, reject) {
-        if (typeof QRCode !== 'undefined') {
+        if (options.isChannelOptional &&
+            (typeof QRCode !== 'undefined')) {
           resolve([new QRCodeDisplay('QR code')]);
         }
         else {

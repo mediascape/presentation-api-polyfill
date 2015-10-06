@@ -337,7 +337,13 @@
     })();
     checkLocalProxyPresence(2000).catch(function () {});
 
-    this.getAvailableDisplays = function () {
+    this.getAvailableDisplays = function (url, options) {
+      options = options || {};
+      if (!options.isChannelOptional) {
+        return new Promise(function (resolve, reject) {
+          resolve([]);
+        });
+      }
       return checkLocalProxyPresence(500)
         .then(function () {
           return new Promise(function (resolve, reject) {
